@@ -10,10 +10,49 @@ import { authClient } from '@/lib/auth.client';
 import type { ActiveOrganization } from '@/lib/auth.client-types';
 
 /**
+ * Get API key from localStorage if available
+ */
+function getStoredApiKey(): string | null {
+  if (typeof window === 'undefined') {
+    return null;
+  }
+  return localStorage.getItem('deepcrawl_api_key');
+}
+
+/**
  * Auth Client API Call:
  * the current authenticated session
+ * Uses API key if available (for cross-domain auth), otherwise uses cookie-based session
  */
 export async function getSession(): Promise<Session | null> {
+  // Try API key first for cross-domain auth
+  const apiKey = getStoredApiKey();
+  if (apiKey) {
+    try {
+      const response = await fetch('/api/auth/getSessionWithAPIKey', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': apiKey,
+        },
+        body: JSON.stringify({ apiKey }),
+      });
+
+      if (response.ok) {
+        const session = await response.json();
+        if (session?.user) {
+          return session;
+        }
+      } else if (response.status === 401) {
+        // API key is invalid - clear it
+        localStorage.removeItem('deepcrawl_api_key');
+      }
+    } catch (error) {
+      console.error('Failed to get session with API key:', error);
+    }
+  }
+
+  // Fall back to cookie-based session
   const { data: session, error } = await authClient.getSession();
 
   if (error) {

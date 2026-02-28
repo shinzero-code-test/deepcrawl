@@ -4,6 +4,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { Loader2 } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useRef } from 'react';
+import { useApiKeyAuth } from '@/components/providers/api-key-auth-provider';
 import { authClient } from '@/lib/auth.client';
 import { authViewSegments } from '@/routes/auth';
 import { useOnSuccessTransition } from '../../hooks/use-success-transition';
@@ -28,12 +29,21 @@ function cleanupMultiSessionCookies() {
   }
 }
 
+function clearApiKeyCookie() {
+  if (typeof document === 'undefined') {
+    return;
+  }
+  document.cookie =
+    'deepcrawl_api_key=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/';
+}
+
 export function Logout() {
   const router = useRouter();
   const signingOut = useRef(false);
   const queryClient = useQueryClient();
   const searchParams = useSearchParams();
   const redirectTo = searchParams.get('redirect');
+  const { clearAuth } = useApiKeyAuth();
 
   const { onSuccess, isPending } = useOnSuccessTransition({
     redirectTo: redirectTo
@@ -53,6 +63,10 @@ export function Logout() {
     authClient.signOut({
       fetchOptions: {
         onSuccess: () => {
+          // Clear API key from localStorage and cookie
+          clearAuth();
+          clearApiKeyCookie();
+
           // Remove all queries
           queryClient.removeQueries();
 
@@ -66,7 +80,7 @@ export function Logout() {
         },
       },
     });
-  }, [onSuccess, queryClient, router]);
+  }, [clearAuth, onSuccess, queryClient, router]);
 
   return (
     <div className="flex items-center justify-center max-sm:h-[calc(100svh-(--spacing(32)))] sm:min-h-svh">

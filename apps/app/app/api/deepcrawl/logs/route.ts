@@ -11,19 +11,29 @@ import { parseListLogsSearchParams } from '@/utils/logs';
 const DEEPCRAWL_BASE_URL = process.env.NEXT_PUBLIC_DEEPCRAWL_API_URL as string;
 
 function extractApiKeyFromRequest(request: NextRequest): string | null {
+  // First check header
   const xApiKey = request.headers.get('x-api-key')?.trim();
   if (xApiKey) {
     return xApiKey;
   }
 
   const auth = request.headers.get('authorization');
-  if (!auth) {
-    return null;
+  if (auth) {
+    const match = auth.match(/^Bearer\s+(.+)$/i);
+    const token = match?.[1]?.trim();
+    if (token && token.length > 0) {
+      return token;
+    }
   }
 
-  const match = auth.match(/^Bearer\s+(.+)$/i);
-  const token = match?.[1]?.trim();
-  return token && token.length > 0 ? token : null;
+  // Check cookie for API key (set by client after login)
+  const cookies = request.cookies;
+  const apiKeyCookie = cookies.get('deepcrawl_api_key');
+  if (apiKeyCookie?.value) {
+    return apiKeyCookie.value;
+  }
+
+  return null;
 }
 
 export async function GET(request: NextRequest) {

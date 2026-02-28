@@ -17,6 +17,7 @@ import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import * as z from 'zod/v4';
+import { useApiKeyAuth } from '@/components/providers/api-key-auth-provider';
 import { SpinnerButton } from '@/components/spinner-button';
 import { useIsHydrated } from '@/hooks/use-hydrated';
 import { useOnSuccessTransition } from '@/hooks/use-success-transition';
@@ -52,6 +53,8 @@ export function SignInForm({
   const { onSuccess, isPending: transitionPending } = useOnSuccessTransition({
     redirectTo,
   });
+
+  const { setApiKey, getSessionWithApiKey } = useApiKeyAuth();
 
   const formSchema = z.object({
     email: z.email(),
@@ -96,6 +99,32 @@ export function SignInForm({
       }
 
       if (data) {
+        // Create an API key after successful sign-in for cross-domain auth
+        try {
+          const { data: apiKeyData, error: apiKeyError } =
+            await authClient.apiKey.create({
+              name: 'Dashboard Session',
+              expiresIn: 60 * 60 * 24 * 30, // 30 days
+              prefix: 'dc_',
+            });
+
+          if (apiKeyError) {
+            console.error('Failed to create API key:', apiKeyError);
+          } else if (apiKeyData?.key) {
+            // Store the API key for session-based auth
+            setApiKey(apiKeyData.key);
+
+            // Also set a cookie for API routes to read
+            // This works because API routes are on the same domain (vercel.app)
+            document.cookie = `deepcrawl_api_key=${apiKeyData.key}; path=/; max-age=${60 * 60 * 24 * 30}; SameSite=Lax`;
+
+            // Validate and get the session
+            await getSessionWithApiKey();
+          }
+        } catch (apiKeyErr) {
+          console.error('Error creating API key:', apiKeyErr);
+        }
+
         await onSuccess();
       }
     } catch (error) {
