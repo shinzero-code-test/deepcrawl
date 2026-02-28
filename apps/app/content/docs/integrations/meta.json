@@ -1,4 +1,4 @@
 {
   "title": "Integrations",
-  "pages": ["nextjs-ai-agents", "cron-job", "context-for-ai"]
+  "pages": ["mcp-server", "nextjs-ai-agents", "cron-job", "context-for-ai"]
 }

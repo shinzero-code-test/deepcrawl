@@ -1,0 +1,135 @@
+---
+title: MCP Server
+description: Use Deepcrawl directly from Claude, ChatGPT, Cursor, and other AI assistants via the Model Context Protocol.
+---
+
+Deepcrawl provides an MCP (Model Context Protocol) server that lets AI assistants like Claude, ChatGPT, Cursor, and others directly call Deepcrawl's web scraping and content extraction tools without any code.
+
+## Quick Start
+
+Add Deepcrawl to your MCP configuration:
+
+```json title=" MCP config (Claude/Cursor/ChatGPT)"
+{
+  "mcpServers": {
+    "deepcrawl": {
+      "command": "npx",
+      "args": ["mcp-remote", "https://deepcrawl-mcp.shinzero.workers.dev/mcp"]
+    }
+  }
+}
+```
+
+<Callout type="info">
+The MCP server is publicly accessible - no additional authentication required. It uses your DeepCrawl API key automatically for all requests.
+</Callout>
+
+## Available Tools
+
+### read_url
+
+Read content from any URL and get structured data including HTML, markdown, and metadata.
+
+**Parameters:**
+- `url` (required) - The URL to read
+- `markdown` (optional) - Return markdown content
+- `rawHtml` (optional) - Return raw HTML
+
+**Example:**
+```
+read_url from https://example.com
+```
+
+### get_markdown
+
+Get clean markdown content from any URL. Ideal for extracting readable content from articles, documentation, or any text-heavy page.
+
+**Parameters:**
+- `url` (required) - The URL to extract markdown from
+- `cleanHTML` (optional) - Apply additional HTML cleaning
+
+**Example:**
+```
+Get markdown from https://example.com
+```
+
+### extract_links
+
+Extract all links from a webpage. Returns internal links, external links, and media URLs in a structured format.
+
+**Parameters:**
+- `url` (required) - The URL to extract links from
+- `includeExternal` (optional) - Include external links
+- `includeMedia` (optional) - Include media URLs (images, videos)
+- `tree` (optional) - Return links as a hierarchical tree
+
+**Example:**
+```
+Extract all links from https://example.com as a tree
+```
+
+### list_logs
+
+View your recent API activity logs. See what requests have been made, their status, and timestamps.
+
+**Parameters:**
+- `limit` (optional) - Number of logs to return (default: 10)
+- `startDate` (optional) - Filter by start date (ISO format)
+- `endDate` (optional) - Filter by end date (ISO format)
+
+**Example:**
+```
+Show my last 20 API logs
+```
+
+## Use Cases
+
+### Research Agent
+
+Use Deepcrawl as part of an AI research workflow:
+
+1. **Map a site** - Use `extract_links` to understand a website's structure
+2. **Get content** - Use `get_markdown` for quick summaries
+3. **Deep dive** - Use `read_url` when you need full metadata or HTML
+
+### Content Extraction
+
+Quickly extract content from web pages:
+
+```
+Get the main content from https://docs.example.com/api-guide as markdown
+```
+
+### Link Analysis
+
+Analyze a website's link structure:
+
+```
+Extract all internal links from https://example.com as a tree
+```
+
+## Configuration
+
+The MCP server is hosted at:
+```
+https://deepcrawl-mcp.shinzero.workers.dev/mcp
+```
+
+It automatically uses your DeepCrawl API key configured in the server. No additional setup required on your end.
+
+## Troubleshooting
+
+If you encounter issues:
+
+1. **Connection errors** - Ensure your MCP client supports Streamable HTTP transport
+2. **Rate limiting** - The server has no rate limits, but be respectful of target websites
+3. **Large pages** - Use `get_markdown` for better performance on large pages
+
+## SDK vs MCP
+
+| Feature | SDK | MCP |
+|---------|-----|-----|
+| Setup required | Yes (API key) | No |
+| Best for | Production apps | Quick prototyping, AI agents |
+| Performance | Faster (direct) | Slightly slower (HTTP) |
+| Caching | Configurable | Enabled by default |

@@ -1,0 +1,13 @@
+{
+  "$schema": "../../../node_modules/wrangler/config-schema.json",
+  "name": "deepcrawl-mcp",
+  "main": "src/index.ts",
+  "compatibility_date": "2025-01-01",
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  "observability": {
+    "enabled": true
+  },
+  "vars": {
+    "DEEPCRAWL_API_URL": "https://deepcrawl-worker-v0.shinzero.workers.dev"
+  }
+}

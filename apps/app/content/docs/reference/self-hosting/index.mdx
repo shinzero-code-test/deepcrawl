@@ -91,3 +91,19 @@ pnpm -C apps/workers/v0 deploy
 ```
 
 Each script uses the corresponding `wrangler.jsonc` configuration and operator secrets. Confirm the deployed routes respond as expected.
+
+## 7. Deploy MCP Server (Optional)
+
+The MCP server lets AI assistants like Claude, ChatGPT, and Cursor directly access DeepCrawl tools.
+
+```bash
+pnpm -C apps/workers/mcp deploy
+```
+
+Set the required secrets:
+
+```bash
+npx wrangler secret put DEEPCRAWL_API_KEY
+```
+
+The MCP server will be available at `https://<your-mcp-worker>.workers.dev/mcp`
