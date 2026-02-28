@@ -3,7 +3,6 @@ import { TooltipProvider } from '@deepcrawl/ui/components/ui/tooltip';
 import { RootProvider } from 'fumadocs-ui/provider/next';
 import { NuqsAdapter } from 'nuqs/adapters/next/app';
 import type { ReactNode } from 'react';
-import { ApiKeyAuthProvider } from './api-key-auth-provider';
 import { QueryProviders } from './query.provider';
 export type NavigationMode = 'sidebar' | 'header';
 
@@ -19,11 +18,9 @@ export async function Providers({ children }: { children: ReactNode }) {
       }}
     >
       <TooltipProvider delayDuration={0}>
-        <ApiKeyAuthProvider>
-          <NuqsAdapter>
-            <QueryProviders>{children}</QueryProviders>
-          </NuqsAdapter>
-        </ApiKeyAuthProvider>
+        <NuqsAdapter>
+          <QueryProviders>{children}</QueryProviders>
+        </NuqsAdapter>
       </TooltipProvider>
       <TailwindIndicator />
     </RootProvider>
