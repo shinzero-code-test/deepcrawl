@@ -17,11 +17,91 @@ export const EPHEMERAL_CACHE = new Map();
 
 const app = createHonoApp();
 
+// Health check endpoint
+app.get('/health', async (c) => {
+  const start = Date.now();
+
+  // Check D1 database
+  let dbStatus = 'unknown';
+  try {
+    const db = c.env.DB_V0;
+    if (db) {
+      await db.prepare('SELECT 1').first();
+      dbStatus = 'healthy';
+    } else {
+      dbStatus = 'not configured';
+    }
+  } catch (e) {
+    dbStatus = 'unhealthy';
+  }
+
+  // Check KV stores
+  const kvStatus = {
+    links: 'unknown',
+    read: 'unknown',
+  };
+  try {
+    await c.env.DEEPCRAWL_V0_LINKS_STORE.get('health-check');
+    kvStatus.links = 'healthy';
+  } catch {
+    kvStatus.links = 'unhealthy';
+  }
+  try {
+    await c.env.DEEPCRAWL_V0_READ_STORE.get('health-check');
+    kvStatus.read = 'healthy';
+  } catch {
+    kvStatus.read = 'unhealthy';
+  }
+
+  const responseTime = Date.now() - start;
+
+  return c.json({
+    status: 'ok',
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime?.() || 'unknown',
+    responseTimeMs: responseTime,
+    services: {
+      database: dbStatus,
+      kvLinksStore: kvStatus.links,
+      kvReadStore: kvStatus.read,
+    },
+    version: '1.0.0',
+  });
+});
+
+// Health check (simple)
+app.get('/healthz', (c) => {
+  return c.text('OK');
+});
+
 // Index & Health check (debug/info)
 app.get('/', async (c) => {
   const brand = resolveBrandConfigFromEnv(c.env);
   const info = getConnInfo(c);
   const apiOrigin = new URL(c.req.url).origin;
+
+  // Get KV stats
+  const kvStats = { links: 'unknown', read: 'unknown' };
+  try {
+    await c.env.DEEPCRAWL_V0_LINKS_STORE.list({ limit: 1 });
+    kvStats.links = 'configured';
+  } catch {
+    kvStats.links = 'error';
+  }
+
+  try {
+    await c.env.DEEPCRAWL_V0_READ_STORE.list({ limit: 1 });
+    kvStats.read = 'configured';
+  } catch {
+    kvStats.read = 'error';
+  }
+
+  try {
+    const readList = await c.env.DEEPCRAWL_V0_READ_STORE.list({ limit: 1 });
+    kvStats.read = readList.keys.length >= 0 ? 'configured' : 'empty';
+  } catch {
+    kvStats.read = 'error';
+  }
 
   return c.json({
     message: `Welcome to ${brand.name} API`,
@@ -29,7 +109,10 @@ app.get('/', async (c) => {
     runtime: getRuntimeKey(),
     nodeEnv: c.env.WORKER_NODE_ENV,
     timestamp: new Date().toISOString(),
+    version: '1.0.0',
     routes: {
+      health: '/health',
+      healthz: '/healthz',
       docs: '/docs',
       openapi: '/openapi',
       read: '/read?=url',
@@ -37,13 +120,14 @@ app.get('/', async (c) => {
       logs: '/logs?id=requestId',
       site: apiOrigin,
     },
-    connInfo: c.env.WORKER_NODE_ENV === 'development' ? 'development' : info,
     services: {
-      scrapeService: !!c.var.scrapeService,
+      kvStore: kvStats,
+      d1Database: c.env.DB_V0 ? 'configured' : 'not configured',
+      authWorker: c.env.AUTH_WORKER ? 'configured' : 'not configured',
     },
     authentication: c.var.session?.user
       ? { ...c.var.session }
-      : 'You are currently not logged in.',
+      : 'disabled (AUTH_MODE=none)',
   });
 });
 
