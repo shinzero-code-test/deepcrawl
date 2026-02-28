@@ -28,9 +28,9 @@
     "port": 8787
   },
   "vars": {
-    "NEXT_PUBLIC_APP_URL": "http://localhost:3000",
-    "BETTER_AUTH_URL": "http://localhost:8787",
-    "AUTH_WORKER_NODE_ENV": "development",
+    "NEXT_PUBLIC_APP_URL": "https://deepcrawl-dev.vercel.app",
+    "BETTER_AUTH_URL": "https://deepcrawl-worker-auth.shinzero.workers.dev",
+    "AUTH_WORKER_NODE_ENV": "production",
     "GITHUB_CLIENT_ID": "Ov23litNP2YxhipDUMUJ",
     "NEXT_PUBLIC_GOOGLE_CLIENT_ID": "292200252097-jtgcuinknei9vol7bb7qc7eu8pn44ogk.apps.googleusercontent.com",
     "FROM_EMAIL": "Deepcrawl <noreply@deepcrawl.dev>"

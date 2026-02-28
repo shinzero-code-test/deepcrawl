@@ -32,16 +32,14 @@
     }
   ],
   "vars": {
-    "NEXT_PUBLIC_APP_URL": "http://localhost:3000",
-    "BETTER_AUTH_URL": "http://localhost:8787",
+    "NEXT_PUBLIC_APP_URL": "https://deepcrawl-dev.vercel.app",
+    "BETTER_AUTH_URL": "https://deepcrawl-worker-auth.shinzero.workers.dev",
     "AUTH_MODE": "better-auth",
-    "API_URL": "http://localhost:8080",
+    "API_URL": "https://deepcrawl-worker-v0.shinzero.workers.dev",
     "ENABLE_ACTIVITY_LOGS": true,
-    "WORKER_NODE_ENV": "development",
+    "WORKER_NODE_ENV": "production",
     "GITHUB_CLIENT_ID": "Ov23litNP2YxhipDUMUJ",
     "NEXT_PUBLIC_GOOGLE_CLIENT_ID": "292200252097-jtgcuinknei9vol7bb7qc7eu8pn44ogk.apps.googleusercontent.com",
-    // JWT_* are only needed when AUTH_MODE=jwt, JWT_ISSUER and JWT_AUDIENCE are optional.
-    // Don't put JWT_SECRET here. Use Wrangler secrets for JWT_SECRET in production. Or add it to .dev.vars for local development.
     "JWT_ISSUER": "",
     "JWT_AUDIENCE": "",
     "ENABLE_API_RATE_LIMIT": true
