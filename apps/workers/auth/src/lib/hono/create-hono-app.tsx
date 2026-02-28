@@ -26,13 +26,52 @@ export default function createHonoApp() {
     .use('*', secureHeaders())
     .use('*', trimTrailingSlash())
     .use('*', serveEmojiFavicon('🛡️'))
-    .use('*', authInstanceMiddleware)
-    .use('*', authContextMiddleware);
+    .use('*', authInstanceMiddleware);
 
-  // /* Mount the handler, the path should be synced with the configs in auth.worker.ts */
-  app.on(['POST', 'GET'], '/api/auth/*', (c) => {
-    return c.var.betterAuth.handler(c.req.raw);
-  });
+  // Mount auth handler - register specific paths
+  const authPaths = [
+    '',
+    '0',
+    '0/csrf',
+    '1',
+    '1/csrf',
+    'signin',
+    'signin/google',
+    'callback',
+    'callback/google',
+    'session',
+    'csrf',
+    'admin',
+    'error',
+    'verify',
+    'verify-request',
+    'forgot-password',
+    'reset-password',
+    'link-email',
+    'change-email',
+    'delete-account',
+    'user',
+  ];
+
+  for (const path of authPaths) {
+    const fullPath = '/api/auth' + (path ? '/' + path : '');
+    app.get(fullPath, async (c) => {
+      try {
+        return await c.var.betterAuth.handler(c.req.raw);
+      } catch (e) {
+        console.error('Auth error:', e);
+        return c.json({ error: String(e) }, 500);
+      }
+    });
+    app.post(fullPath, async (c) => {
+      try {
+        return await c.var.betterAuth.handler(c.req.raw);
+      } catch (e) {
+        console.error('Auth error:', e);
+        return c.json({ error: String(e) }, 500);
+      }
+    });
+  }
 
   app.onError(onError);
   app.notFound(notFound);
