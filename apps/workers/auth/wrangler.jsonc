@@ -29,7 +29,7 @@
   },
   "vars": {
     "NEXT_PUBLIC_APP_URL": "https://deepcrawl-dev.vercel.app",
-    "BETTER_AUTH_URL": "https://deepcrawl-dev.vercel.app",
+    "BETTER_AUTH_URL": "https://deepcrawl-worker-auth.shinzero.workers.dev",
     "AUTH_WORKER_NODE_ENV": "production",
     "GITHUB_CLIENT_ID": "Ov23litNP2YxhipDUMUJ",
     "NEXT_PUBLIC_GOOGLE_CLIENT_ID": "918415578723-lg97mupdl7n9brco6h2qbj0q1uhsvvup.apps.googleusercontent.com",
