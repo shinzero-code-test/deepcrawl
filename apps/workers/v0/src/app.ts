@@ -5,6 +5,9 @@ import { createContext } from '@/lib/context';
 import createHonoApp from '@/lib/hono/create-hono-app';
 import { openAPIHandler } from '@/lib/openapi/openapi.handler';
 import { rpcHandler } from '@/lib/orpc/rpc.handler';
+import { processBatchRequest } from '@/routers/batch/batch.processor';
+import { processJsonRequest } from '@/routers/json/json.processor';
+import { processPdfRequest } from '@/routers/pdf/pdf.processor';
 
 // Preload heavy modules during worker initialization to reduce cold start time
 import '@/services/scrape/scrape.service';
@@ -16,6 +19,30 @@ import '@paoramen/cheer-reader';
 export const EPHEMERAL_CACHE = new Map();
 
 const app = createHonoApp();
+
+// JSON endpoint
+app.post('/json', async (c) => {
+  const context = await createContext({ context: c });
+  const input = await c.req.json();
+  const result = await processJsonRequest(context, input);
+  return c.json(result);
+});
+
+// PDF endpoint
+app.post('/pdf', async (c) => {
+  const context = await createContext({ context: c });
+  const input = await c.req.json();
+  const result = await processPdfRequest(context, input);
+  return c.json(result);
+});
+
+// Batch endpoint
+app.post('/batch', async (c) => {
+  const context = await createContext({ context: c });
+  const input = await c.req.json();
+  const result = await processBatchRequest(context, input);
+  return c.json(result);
+});
 
 // Health check endpoint
 app.get('/health', async (c) => {

@@ -3,6 +3,7 @@ import type {
   InferContractRouterOutputs,
 } from '@orpc/contract';
 import { oc } from '@orpc/contract';
+import { extractContract } from './extract';
 import { ExtractLinksContract, getLinksContract } from './links';
 import {
   exportResponseContract,
@@ -10,6 +11,7 @@ import {
   listLogsContract,
 } from './logs';
 import { getMarkdownContract, readUrlContract } from './read';
+import { screenshotContract } from './screenshot';
 
 export const contract = oc.router({
   read: oc.prefix('/read').router({
@@ -24,6 +26,12 @@ export const contract = oc.router({
     getOne: getOneLogContract,
     listLogs: listLogsContract,
     exportResponse: exportResponseContract,
+  }),
+  screenshot: oc.prefix('/screenshot').router({
+    capture: screenshotContract,
+  }),
+  extract: oc.prefix('/extract').router({
+    elements: extractContract,
   }),
 });
 

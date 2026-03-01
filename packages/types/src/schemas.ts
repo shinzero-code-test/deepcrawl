@@ -39,11 +39,16 @@ export * from './common/response-schemas';
 
 /* Metrics */
 export * from './metrics/schemas';
-
+export * from './routers/batch/schemas';
+export * from './routers/extract/schemas';
+export * from './routers/extract/schemas';
+export * from './routers/json/schemas';
 /* Routers */
 export * from './routers/links/schemas';
 export * from './routers/logs/schemas';
+export * from './routers/pdf/schemas';
 export * from './routers/read/schemas';
+export * from './routers/screenshot/schemas';
 
 /* Services */
 export * from './services/cache/schemas';

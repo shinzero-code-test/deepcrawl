@@ -8,6 +8,6 @@
     "enabled": true
   },
   "vars": {
-    "DEEPCRAWL_API_URL": "https://deepcrawl-worker-v0.shinzero.workers.dev"
+    "DEEPCRAWL_API_URL": "https://deepcrawl-worker-v0-production.shinzero.workers.dev"
   }
 }

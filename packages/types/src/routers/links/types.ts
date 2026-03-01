@@ -126,7 +126,7 @@ export type LinksTree = z.infer<typeof LinksTreeSchema>;
  * @property {boolean} [robots] - Whether to fetch and parse robots.txt
  * @property {boolean} [sitemapXML] - Whether to fetch and parse sitemap.xml
  * @property {Object} [metadataOptions] - Options for metadata extraction
- * @property {'cheerio-reader'|'html-rewriter'} [cleaningProcessor] - The cleaning processor to use
+ * @property {'cheerio-reader'|'html-rewriter'|'browser'} [cleaningProcessor] - The cleaning processor to use
  * @property {Object} [htmlRewriterOptions] - Options for HTML cleaning with html-rewriter
  * @property {Object} [readerCleaningOptions] - Options for HTML cleaning with cheerio-reader
  * @property {Object} [fetchOptions] - Options for the fetch request

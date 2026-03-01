@@ -1,6 +1,8 @@
 import {
+  ExtractErrorResponseSchema,
   LinksErrorResponseSchema,
   ReadErrorResponseSchema,
+  ScreenshotErrorResponseSchema,
 } from '@deepcrawl/types/schemas';
 import type { ErrorMap, ErrorMapItem } from '@orpc/contract';
 import { oo } from '@orpc/openapi';
@@ -71,6 +73,8 @@ const InvalidExportFormatSchema = z.object({
 export const errorConfig: {
   READ_ERROR_RESPONSE: ErrorMapItem<typeof ReadErrorResponseSchema>;
   LINKS_ERROR_RESPONSE: ErrorMapItem<typeof LinksErrorResponseSchema>;
+  SCREENSHOT_ERROR_RESPONSE: ErrorMapItem<typeof ScreenshotErrorResponseSchema>;
+  EXTRACT_ERROR_RESPONSE: ErrorMapItem<typeof ExtractErrorResponseSchema>;
   RATE_LIMITED: ErrorMapItem<typeof RateLimitedSchema>;
   LOGS_INVALID_DATE_RANGE: ErrorMapItem<typeof LogsInvalidDateRangeSchema>;
   LOGS_INVALID_SORT: ErrorMapItem<typeof LogsInvalidSortSchema>;
@@ -85,6 +89,16 @@ export const errorConfig: {
     status: 500,
     message: 'Failed to extract links from URL',
     data: LinksErrorResponseSchema,
+  },
+  SCREENSHOT_ERROR_RESPONSE: {
+    status: 500,
+    message: 'Failed to capture screenshot',
+    data: ScreenshotErrorResponseSchema,
+  },
+  EXTRACT_ERROR_RESPONSE: {
+    status: 500,
+    message: 'Failed to extract elements from URL',
+    data: ExtractErrorResponseSchema,
   },
   RATE_LIMITED: {
     status: 429,
@@ -157,6 +171,32 @@ export const errorSpec = {
         500: {
           ...currentOperation.responses?.[500],
           description: 'Links extraction failed',
+        },
+      },
+    }),
+  ),
+  SCREENSHOT_ERROR_RESPONSE: oo.spec(
+    errorConfig.SCREENSHOT_ERROR_RESPONSE,
+    (currentOperation) => ({
+      ...currentOperation,
+      responses: {
+        ...currentOperation.responses,
+        500: {
+          ...currentOperation.responses?.[500],
+          description: 'Screenshot capture failed',
+        },
+      },
+    }),
+  ),
+  EXTRACT_ERROR_RESPONSE: oo.spec(
+    errorConfig.EXTRACT_ERROR_RESPONSE,
+    (currentOperation) => ({
+      ...currentOperation,
+      responses: {
+        ...currentOperation.responses,
+        500: {
+          ...currentOperation.responses?.[500],
+          description: 'Element extraction failed',
         },
       },
     }),

@@ -2,6 +2,7 @@ interface ExtractLinksOptions {
   includeExternal?: boolean;
   includeMedia?: boolean;
   tree?: boolean;
+  cleaningProcessor?: 'cheerio-reader' | 'html-rewriter' | 'browser';
 }
 
 interface LinksResponse {
@@ -34,6 +35,9 @@ export async function extractLinksTool(
   }
   if (options.tree !== undefined) {
     body.tree = options.tree;
+  }
+  if (options.cleaningProcessor) {
+    body.cleaningProcessor = options.cleaningProcessor;
   }
 
   const response = await globalThis.fetch(`${apiUrl}/links`, {

@@ -262,7 +262,7 @@ const { metadata, cleanedHtml, robots, sitemapXML, cleaningProcessor } =
  * @property {boolean} [robots] - Whether to fetch and parse robots.txt
  * @property {boolean} [sitemapXML] - Whether to fetch and parse sitemap.xml (experimental)
  * @property {MetadataOptions} [metadataOptions] - Options for metadata extraction
- * @property {'cheerio-reader' | 'html-rewriter'} [cleaningProcessor] - The cleaning processor to use
+ * @property {'cheerio-reader' | 'html-rewriter' | 'browser'} [cleaningProcessor] - The cleaning processor to use
  * @property {HTMLRewriterOptions} [htmlRewriterOptions] - Options for HTML cleaning with html-rewriter
  * @property {ReaderCleaningOptions} [readerCleaningOptions] - Options for HTML cleaning with cheerio-reader
  * @property {FetchOptions} [fetchOptions] - Options for the fetch request
@@ -297,13 +297,13 @@ export const ScrapeOptionsSchema = z
       examples: [DEFAULT_METADATA_OPTIONS],
     }),
     cleaningProcessor: z
-      .enum(['cheerio-reader', 'html-rewriter'])
+      .enum(['cheerio-reader', 'html-rewriter', 'browser'])
       .default(cleaningProcessor)
       .optional()
       .meta({
         default: cleaningProcessor,
         description: 'The cleaning processor to use.',
-        examples: ['cheerio-reader', 'html-rewriter'],
+        examples: ['cheerio-reader', 'html-rewriter', 'browser'],
       }),
     htmlRewriterOptions: HTMLRewriterOptionsSchema.optional().meta({
       description: 'Options for HTML cleaning with html-rewriter.',

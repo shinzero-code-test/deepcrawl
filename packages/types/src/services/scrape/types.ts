@@ -80,7 +80,7 @@ export type FetchOptions = z.infer<typeof FetchOptionsSchema>;
  * @property {boolean} [robots] - Whether to fetch and parse robots.txt
  * @property {boolean} [sitemapXML] - Whether to fetch and parse sitemap.xml (experimental)
  * @property {MetadataOptions} [metadataOptions] - Options for metadata extraction
- * @property {'cheerio-reader' | 'html-rewriter'} [cleaningProcessor] - The cleaning processor to use
+ * @property {'cheerio-reader' | 'html-rewriter' | 'browser'} [cleaningProcessor] - The cleaning processor to use
  * @property {HTMLRewriterOptions} [htmlRewriterOptions] - Options for HTML cleaning with html-rewriter
  * @property {ReaderCleaningOptions} [readerCleaningOptions] - Options for HTML cleaning with cheerio-reader
  * @property {FetchOptions} [fetchOptions] - Options for the fetch request

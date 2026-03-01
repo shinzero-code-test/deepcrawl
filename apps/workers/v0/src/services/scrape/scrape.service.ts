@@ -27,6 +27,7 @@ import { logError, logWarn } from '@/utils/loggers';
 import { RobotsParser } from '@/utils/meta/robots-parser';
 import { SitemapParser } from '@/utils/meta/sitemap-parser';
 import { HTMLRewriterCleaning } from '../html-cleaning/html-cleaning.service';
+import { browserRenderWithRetry } from './browser-render.service';
 
 interface MetaFilesOptions {
   robots?: boolean;
@@ -519,6 +520,7 @@ export class ScrapeService {
     ...options
   }: ScrapeOptions & {
     url: string;
+    browser?: any;
   }): Promise<ScrapedData> {
     const {
       robots,
@@ -530,21 +532,35 @@ export class ScrapeService {
       readerCleaningOptions,
       cleanedHtml,
       fetchOptions,
+      browser,
     } = options;
 
     // Default isMetadata to true unless explicitly set to false
     const isMetadata = enableMetadata !== false;
 
+    let html: string;
+    let isIframeAllowed = true;
+
     try {
-      const fetchResult = await this.fetchPage(url, {
-        ...fetchOptions,
-      });
+      // Use browser rendering if cleaningProcessor is 'browser' and browser is available
+      if (cleaningProcessor === 'browser' && browser) {
+        const browserResult = await browserRenderWithRetry(browser, {
+          url,
+          waitUntil: 'networkidle0',
+          timeout: 60000,
+        });
+        html = browserResult.html;
+      } else {
+        // Use regular fetch
+        const fetchResult = await this.fetchPage(url, {
+          ...fetchOptions,
+        });
 
-      const html =
-        typeof fetchResult === 'string' ? fetchResult : fetchResult.html;
+        html = typeof fetchResult === 'string' ? fetchResult : fetchResult.html;
 
-      const isIframeAllowed =
-        typeof fetchResult !== 'string' && fetchResult.isIframeAllowed;
+        isIframeAllowed =
+          typeof fetchResult !== 'string' && fetchResult.isIframeAllowed;
+      }
 
       const $ = cheerio.load(html);
       const title = $('title').text().trim();
@@ -628,6 +644,10 @@ export class ScrapeService {
           if (readerCleaningResult.content) {
             dataResults.cleanedHtml = readerCleaningResult.content;
           }
+        } else if (cleaningProcessor === 'browser') {
+          // Browser-rendered HTML is already "cleaned" (rendered content only)
+          // Just use it as-is for cleanedHtml
+          dataResults.cleanedHtml = html;
         }
       }
 
